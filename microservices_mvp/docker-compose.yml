@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  auth_service:
+    build: ./auth_service
+    # Port tidak diekspos ke host, hanya ke jaringan internal Docker
+    expose:
+      - "8003" 
+    volumes:
+      - ./auth_service:/app
+    # Perintah CMD sudah ada di Dockerfile auth_service
+
+  user_service:
+    build: ./user_service
+    expose:
+      - "8000"
+    volumes:
+      - ./user_service:/app
+    # Perintah CMD sudah ada di Dockerfile user_service
+
+  product_service:
+    build: ./product_service
+    expose:
+      - "8001"
+    volumes:
+      - ./product_service:/app
+    # Perintah CMD sudah ada di Dockerfile product_service
+
+  order_service:
+    build: ./order_service
+    expose:
+      - "8002"
+    volumes:
+      - ./order_service:/app
+    # Perintah CMD sudah ada di Dockerfile order_service
+
+  frontend_react_app:
+    build: ./frontend_react_app
+    volumes:
+      # Volume untuk src, berguna jika menjalankan dev server di dalam container
+      # Untuk build Nginx statis, ini mungkin tidak langsung merefleksikan perubahan tanpa rebuild image
+      # kecuali jika Dockerfile Nginx di frontend_react_app dikonfigurasi untuk hot-reload (jarang untuk Nginx).
+      # Namun, kita sertakan untuk konsistensi atau penggunaan di masa depan.
+      - ./frontend_react_app/src:/app/src 
+    expose:
+      - "80" # Nginx di dalam container frontend_react_app melayani pada port 80
+
+  nginx_proxy:
+    build: ./nginx # Direktori tempat Dockerfile Nginx berada
+    ports:
+      - "80:80" # Ekspos port 80 Nginx ke port 80 host
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro # Mount konfigurasi Nginx (read-only)
+      # Opsional: Mount log Nginx ke host jika diperlukan
+      # - ./nginx/logs:/var/log/nginx 
+    depends_on: # Pastikan backend services dan frontend siap sebelum Nginx proxy dimulai
+      - auth_service
+      - user_service
+      - product_service
+      - order_service
+      - frontend_react_app # Menambahkan frontend_react_app ke depends_on
