@@ -19,7 +19,7 @@ function LoginPage() {
         try {
             // Nginx will be at http://localhost (port 80 by default)
             // The /auth/ prefix is handled by Nginx reverse proxy
-            const response = await axios.post('http://localhost/auth/login', formData, {
+            const response = await axios.post('${process.env.REACT_APP_API_BASE_URL}/auth/login', formData, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }

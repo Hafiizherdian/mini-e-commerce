@@ -22,7 +22,7 @@ function RegisterPage() {
         try {
             // Nginx will be at http://localhost (port 80 by default)
             // The /auth/ prefix is handled by Nginx reverse proxy
-            const response = await axios.post('http://localhost/auth/register', userData, {
+            const response = await axios.post('${process.env.REACT_APP_API_BASE_URL}/auth/register', userData, {
                 headers: {
                     'Content-Type': 'application/json'
                 }

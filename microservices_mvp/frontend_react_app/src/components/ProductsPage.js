@@ -32,7 +32,7 @@ function ProductsPage() {
             setError('');
             setOrderMessage('');
             try {
-                const response = await axios.get('http://localhost/products');
+                const response = await axios.get('${process.env.REACT_APP_API_BASE_URL}/products');
                 if (response.status === 200) {
                     setProducts(response.data);
                     // Initialize quantities to 1 for each product
